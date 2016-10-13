@@ -63,10 +63,10 @@ hist(sum_by_date_imput$steps,xlab="Steps by Date after imputing", ylab="Frequenc
 8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 ```{r,echo=TRUE}
 dat_imput$weekday<-weekdays(as.Date(dat_imput$date))
-dat_imput$weekday[dat_imput$weekday %in% c('Monday','Tuesday','Wednesday','Thursday','Friday')]<-'Yes'
-dat_imput$weekday[dat_imput$weekday %in% c('Saturday','Sunday')]<-'No'
-by_interval_imput<-group_by(dat_imput,interval,weekday)
-avg_by_intv_imput<-summarise(by_interval_imput, steps=mean(steps))
+dat_imput$weekday[dat_imput$weekday %in% c('Monday','Tuesday','Wednesday','Thursday','Friday')]<-'Weekday'
+dat_imput$weekday[dat_imput$weekday %in% c('Saturday','Sunday')]<-'Weekend'
+dat_imput_avgweek<-aggregate(steps~interval+weekday, data=dat_imput, FUN = mean)
 library(lattice)
-
+xyplot(steps~interval|weekday,data=dat_imput_avgweek,type = "l",main="steps taken by interval")
 ```
+
