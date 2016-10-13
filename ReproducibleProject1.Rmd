@@ -1,0 +1,72 @@
+---
+title: "ReproducibleResearchProject1"
+author: "Rui"
+date: "October 10, 2016"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+1.Read csv file
+```{r,echo=TRUE}
+getwd()
+setwd("DataScience/ReproducibleResearch/PeerAssessment1")
+unzip("activity.zip")
+dat<-read.csv(file="activity.csv", header=TRUE, sep=",")
+dat
+```
+
+2.Histogram of the total number of steps taken each day
+```{r,echo=TRUE}
+install.packages("dplyr")
+library(dplyr)
+by_date<-group_by(dat,date)   
+sum_by_date<-summarise(by_date,steps=sum(steps,na.rm = TRUE))
+hist(sum_by_date$steps,xlab="Steps by Date", ylab="Frequency", main="Frequency of Total Steps per Day")
+```
+3.Mean and median number of steps taken each day
+```{r,echo=TRUE}
+mean_by_date<-summarise(by_date,mean_steps=mean(steps,na.rm = TRUE))
+median_by_date<-summarise(by_date,median_steps=median(steps,na.rm = TRUE))
+```
+
+4.Time series plot of the average number of steps taken
+```{r, echo=TRUE}
+by_interval<-group_by(dat,interval)
+avg_by_intv<-summarise(by_interval, steps=mean(steps,na.rm=TRUE))
+plot(avg_by_intv$interval,avg_by_intv$steps,type="l", xlab="interval",ylab="steps")
+```
+
+5. The 5-minute interval that, on average, contains the maximum number of steps
+```{r,echo=TRUE}
+max_intv<-filter(avg_by_intv,steps==max(avg_by_intv$steps))
+print(paste("The 5-minute interval that, on average, contains the maximum number of steps is ", max_intv$interval))
+```
+
+6. Code to describe and show a strategy for imputing missing data. First determine the number of missing cases. Then replace steps with "NA" with the average steps for that specific interval.
+```{r, echo=TRUE}
+print(paste(sum(is.na(dat$steps)), "cases are missing."))
+dat_imput<-dat
+dat_imput$steps[is.na(dat_imput$steps)]<-avg_by_intv$steps[avg_by_intv$interval==dat_imput$interval[is.na(dat_imput$steps)]]
+
+```
+
+7. Histogram of the total number of steps taken each day after missing values are imputed
+```{r,echo=TRUE}
+by_date_imput<-group_by(dat_imput,date)   
+sum_by_date_imput<-summarise(by_date_imput,steps=sum(steps,na.rm = TRUE))
+hist(sum_by_date_imput$steps,xlab="Steps by Date after imputing", ylab="Frequency", main="Frequency of Total Steps per Day after imputing")
+```
+
+8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+```{r,echo=TRUE}
+dat_imput$weekday<-weekdays(as.Date(dat_imput$date))
+dat_imput$weekday[dat_imput$weekday %in% c('Monday','Tuesday','Wednesday','Thursday','Friday')]<-'Yes'
+dat_imput$weekday[dat_imput$weekday %in% c('Saturday','Sunday')]<-'No'
+by_interval_imput<-group_by(dat_imput,interval,weekday)
+avg_by_intv_imput<-summarise(by_interval_imput, steps=mean(steps))
+library(lattice)
+
+```
