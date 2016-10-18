@@ -2,7 +2,9 @@
 title: "ReproducibleResearchProject1"
 author: "Rui"
 date: "October 10, 2016"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
@@ -11,8 +13,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 1.Read csv file
 ```{r,echo=TRUE}
-getwd()
-setwd("DataScience/ReproducibleResearch/PeerAssessment1")
+
 unzip("activity.zip")
 dat<-read.csv(file="activity.csv", header=TRUE, sep=",")
 dat
